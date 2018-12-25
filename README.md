@@ -1,3 +1,3 @@
-# kubecui
+# gitcui
 
-An interactive terminal based UI for kubernetes
+An interactive terminal based UI for Git
