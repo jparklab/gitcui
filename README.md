@@ -1,3 +1,3 @@
 # gitcui
 
-An interactive terminal based UI for Git
+An interactive terminal based UI for Git.
