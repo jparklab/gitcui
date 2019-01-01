@@ -45,16 +45,7 @@ import (
 var TableFormatting struct {
 	Header                func(*tview.TableCell) *tview.TableCell
 	Selected              func(*tview.TableCell) *tview.TableCell
-	/*
-	StatusSelected        func(...interface{}) string
-	StatusNormal          func(...interface{}) string
-	StatusControlSelected func(...interface{}) string
-	StatusControlNormal   func(...interface{}) string
-	CompareTop            func(...interface{}) string
-	CompareBottom         func(...interface{}) string
-	*/
 }
-
 
 ////////////////////////////////////////////////////////////
 // types
@@ -250,16 +241,6 @@ func makeViewRoot(app *tview.Application, repo *git.Repository) {
 		SetDirection(tview.FlexRow).
 		AddItem(topPanel, 0, 1, true).
 		AddItem(dfv.GetView(), 0, 1, false)
-	/*
-	leftPanel := tview.NewFlex().
-		SetDirection(tview.FlexRow).
-		AddItem(cv.GetView(), 0, 2, true).
-		AddItem(dv.GetView(), 0, 1, false)
-
-	root := tview.NewFlex().
-		AddItem(leftPanel, 0, 1, true).
-		AddItem(tv.GetView(), 0, 1, false)
-	*/
 
 	const FullScreen = true
 	app.SetRoot(root, FullScreen)

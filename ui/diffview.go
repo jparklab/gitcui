@@ -25,16 +25,12 @@
 package ui
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"gopkg.in/src-d/go-git.v4/plumbing/format/diff"
-	/*
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-	"gopkg.in/src-d/go-git.v4/plumbing/filemode"
-	"gopkg.in/src-d/go-git.v4/utils/merkletrie"
-	*/
 )
 
 // DiffView is a view that shows changes for a single text file
@@ -48,6 +44,11 @@ type diffView struct {
 	top TopLevelView
 	view *tview.Table
 }
+
+const (
+	LineColorInserted = tcell.ColorGreen
+	LineColorDeleted = tcell.ColorRed
+)
 
 ////////////////////////////////////////////////////////////
 // diffView methods
@@ -92,10 +93,21 @@ func (tv *diffView) SetFilePatch(patch diff.FilePatch) {
 	idx := 0
 	for _, c := range patch.Chunks() {
 		content := c.Content()
+		op := c.Type()
 		for _, l := range strings.Split(content, "\n") {
-			tableView.SetCell(idx, 0, 
-				tview.NewTableCell(l),
-			)
+			var cell *tview.TableCell
+			switch op {
+			case diff.Equal:
+				cell = tview.NewTableCell(fmt.Sprintf(" %s", l))
+			case diff.Add:
+				cell = tview.NewTableCell(fmt.Sprintf("+%s", l))
+				cell.SetTextColor(LineColorInserted)
+			case diff.Delete:
+				cell = tview.NewTableCell(fmt.Sprintf("-%s", l))
+				cell.SetTextColor(LineColorDeleted)
+			}
+
+			tableView.SetCell(idx, 0, cell)
 			idx++
 		}
 	}
