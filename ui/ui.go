@@ -73,6 +73,7 @@ type topLevelView struct {
 	listView CommitListView
 	detailView CommitDetailView
 	treeView TreeContentView
+	diffView DiffView
 
 	curFocusView interface{}
 }
@@ -98,13 +99,15 @@ func (tv *topLevelView) NotifySelectionChange(commit *object.Commit) {
 
 	tv.detailView.SetSelected(commit)
 	tv.updateTreeView()
+
 }
 
 // afterViewInit is called after all children views are created
-func (tv *topLevelView) afterViewInit(lv CommitListView, dv CommitDetailView, tcv TreeContentView) {
+func (tv *topLevelView) afterViewInit(lv CommitListView, dv CommitDetailView, tcv TreeContentView, dfv DiffView) {
 	tv.listView = lv
 	tv.detailView = dv
 	tv.treeView = tcv
+	tv.diffView = dfv
 
 	tv.curFocusView = lv
 	tv.app.SetInputCapture(func (event *tcell.EventKey) *tcell.EventKey {
@@ -143,6 +146,16 @@ func (tv *topLevelView) updateTreeView() {
 	}
 
 	tv.treeView.SetSelected(commit, reference)
+
+	// FIXME: for testing
+	if reference != nil {
+		patch, _ := commit.Patch(reference)
+		filePatches := patch.FilePatches()
+
+		if len(filePatches) > 0 {
+			tv.diffView.SetFilePatch(filePatches[0])
+		}
+	}
 }
 
 // switchMode switches diff mode
@@ -160,13 +173,15 @@ func (tv *topLevelView) moveFocus(forward bool) {
 	views := []interface{} {
 		tv.listView,
 		tv.treeView,
-		tv.detailView,
+		tv.diffView,
+		// tv.detailView,
 	}
 
 	primitives := []tview.Primitive {
 		tv.listView.GetView(),
 		tv.treeView.GetView(),
-		tv.detailView.GetView(),
+		tv.diffView.GetView(),
+		// tv.detailView.GetView(),
 	}
 
 	for idx, v := range views {
@@ -222,10 +237,20 @@ func makeViewRoot(app *tview.Application, repo *git.Repository) {
 	cv := NewCommitListView(topView, commits)
 	dv := NewCommitDetailView(topView)
 	tv := NewTreeContentView(topView, commits)
+	dfv := NewDiffView(topView)
 
-	topView.(*topLevelView).afterViewInit(cv, dv, tv)
+	topView.(*topLevelView).afterViewInit(cv, dv, tv, dfv)
 
 	// layout views
+	topPanel := tview.NewFlex().
+		AddItem(cv.GetView(), 0, 1, true).
+		AddItem(tv.GetView(), 0, 1, false)
+
+	root := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(topPanel, 0, 1, true).
+		AddItem(dfv.GetView(), 0, 1, false)
+	/*
 	leftPanel := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(cv.GetView(), 0, 2, true).
@@ -234,6 +259,7 @@ func makeViewRoot(app *tview.Application, repo *git.Repository) {
 	root := tview.NewFlex().
 		AddItem(leftPanel, 0, 1, true).
 		AddItem(tv.GetView(), 0, 1, false)
+	*/
 
 	const FullScreen = true
 	app.SetRoot(root, FullScreen)

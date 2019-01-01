@@ -85,7 +85,7 @@ func NewTreeNodeData(entry object.TreeEntry, changes object.Changes, state merkl
 
 
 ////////////////////////////////////////////////////////////
-// treeContentView functions
+// treeContentView methods
 ////////////////////////////////////////////////////////////
 
 // NewTreeContentView creates an instance of TreeContentView
