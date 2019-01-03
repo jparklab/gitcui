@@ -34,12 +34,8 @@ import (
 	git "gopkg.in/src-d/go-git.v4"
 
 	"gopkg.in/src-d/go-git.v4/storage/memory"
-	/*
-	"fmt"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
-	//*/
 
-	"gitlab.parkjiyoung.com/application/gitcui/ui"
+	"github.com/jparklab/gitcui/ui"
 )
 
 type RunOptions struct {

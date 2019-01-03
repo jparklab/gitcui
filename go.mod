@@ -1,4 +1,4 @@
-module gitlab.parkjiyoung.com/application/gitcui
+module github.com/jparklab/gitcui
 
 require (
 	github.com/fatih/color v1.7.0

@@ -140,7 +140,7 @@ func (tv *topLevelView) updateTreeView() {
 
 	// FIXME: for testing
 	if reference != nil {
-		patch, _ := commit.Patch(reference)
+		patch, _ := reference.Patch(commit)
 		filePatches := patch.FilePatches()
 
 		if len(filePatches) > 0 {
@@ -257,15 +257,6 @@ func initFormatting() {
 			SetAttributes(tcell.AttrBold).
 			SetAlign(tview.AlignCenter)
 	}
-
-	/*
-	Formatting.StatusSelected = color.New(color.BgMagenta, color.FgWhite).SprintFunc()
-	Formatting.StatusNormal = color.New(color.ReverseVideo).SprintFunc()
-	Formatting.StatusControlSelected = color.New(color.BgMagenta, color.FgWhite, color.Bold).SprintFunc()
-	Formatting.StatusControlNormal = color.New(color.ReverseVideo, color.Bold).SprintFunc()
-	Formatting.CompareTop = color.New(color.BgMagenta).SprintFunc()
-	Formatting.CompareBottom = color.New(color.BgGreen).SprintFunc()
-	*/
 }
 
 ////////////////////////////////////////////////////////////
