@@ -105,20 +105,6 @@ func (tv *treeContentView) GetView() *tview.TreeView {
 	return tv.view
 }
 
-// helper function to add children
-func addChildren(target *tview.TreeNode, parent *object.Tree) {
-	for _, e := range parent.Entries {
-		node := tview.NewTreeNode(e.Name).
-			SetReference(e)
-
-		target.AddChild(node)
-		if e.Mode == filemode.Dir {
-			child, _ := parent.Tree(e.Name)
-			addChildren(node, child)
-		}
-	}
-}
-
 func determineState(a, b merkletrie.Action) merkletrie.Action {
 	var state merkletrie.Action = a
 
@@ -205,7 +191,6 @@ func buildTree(name string, pathComponents []string, curTree *object.Tree, refTr
 		}
 	}
 
-
 	var subdirs []string
 	var files []string
 	for d := range subdirsMap {
@@ -262,7 +247,9 @@ func buildTree(name string, pathComponents []string, curTree *object.Tree, refTr
 					childNode.SetColor(NodeColorModified)
 				}
 			}
-			data = NewTreeNodeData(filesMap[file], nil, state)
+			data = NewTreeNodeData(filesMap[file], object.Changes{ c }, state)
+
+			childNode.SetSelectable(true)
 		} else {
 			data = NewTreeNodeData(filesMap[file], nil, 0)
 		}
@@ -317,5 +304,17 @@ func (tv *treeContentView) SetSelected(commit *object.Commit, reference *object.
 
 	root := buildTree(".", []string{}, tree, refTree, changes, MaxOpenDepth)
 
-	tv.view.SetRoot(root)
+	tv.view.SetRoot(root).SetCurrentNode(root).
+		SetSelectedFunc(func(node *tview.TreeNode) {
+			data := node.GetReference().(*treeNodeData)
+			if len(data.changes) > 0 {
+				change := data.changes[0]
+				patch, _ := change.Patch()
+				filePatch := patch.FilePatches()
+
+				if len(filePatch) > 0 && !filePatch[0].IsBinary() {
+					tv.top.NotifyFileSelectionChange(filePatch[0])
+				}
+			}
+		})
 }

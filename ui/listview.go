@@ -121,6 +121,6 @@ func (cv *commitListView) selectionChanged(row, column int) {
 		}
 
 		commit := cv.noMergeCommits[idx]
-		cv.top.NotifySelectionChange(commit)
+		cv.top.NotifyCommitSelectionChange(commit)
 	}
 }

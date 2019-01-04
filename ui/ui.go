@@ -35,6 +35,7 @@ import (
 
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/format/diff"
 )
 
 ////////////////////////////////////////////////////////////
@@ -81,7 +82,7 @@ func NewTopLevelView(app *tview.Application, repo *git.Repository, commits []*ob
 	return &topView
 }
 
-func (tv *topLevelView) NotifySelectionChange(commit *object.Commit) {
+func (tv *topLevelView) NotifyCommitSelectionChange(commit *object.Commit) {
 	if tv.curSelection == commit {
 		return
 	}
@@ -90,7 +91,10 @@ func (tv *topLevelView) NotifySelectionChange(commit *object.Commit) {
 
 	tv.detailView.SetSelected(commit)
 	tv.updateTreeView()
+}
 
+func (tv *topLevelView) NotifyFileSelectionChange(patch diff.FilePatch) {
+	tv.diffView.SetFilePatch(patch)
 }
 
 // afterViewInit is called after all children views are created
@@ -123,7 +127,7 @@ func (tv *topLevelView) afterViewInit(lv CommitListView, dv CommitDetailView, tc
 		return event
 	})
 
-	tv.NotifySelectionChange(tv.head)
+	tv.NotifyCommitSelectionChange(tv.head)
 }
 
 func (tv *topLevelView) updateTreeView() {
@@ -137,16 +141,6 @@ func (tv *topLevelView) updateTreeView() {
 	}
 
 	tv.treeView.SetSelected(commit, reference)
-
-	// FIXME: for testing
-	if reference != nil {
-		patch, _ := reference.Patch(commit)
-		filePatches := patch.FilePatches()
-
-		if len(filePatches) > 0 {
-			tv.diffView.SetFilePatch(filePatches[0])
-		}
-	}
 }
 
 // switchMode switches diff mode

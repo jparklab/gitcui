@@ -26,6 +26,7 @@ package ui
 
 import (
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/format/diff"
 )
 
 // DiffMode determines which changes treeview shows
@@ -42,8 +43,10 @@ const (
 // that handles global events
 type TopLevelView interface {
 
-	// NotifySelectionChange is called to notify selection change
-	NotifySelectionChange(commit *object.Commit)
+	// NotifyCommitSelectionChange is called to notify commit selection has been changed
+	NotifyCommitSelectionChange(commit *object.Commit)
 
+	// NotifyFileSelectionChange is called to notify file selection has been changed
+	NotifyFileSelectionChange(patch diff.FilePatch)
 	
 }

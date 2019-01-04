@@ -27,7 +27,7 @@ package ui
 import (
 	"fmt"
 	"strings"
-
+	
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"gopkg.in/src-d/go-git.v4/plumbing/format/diff"
@@ -49,6 +49,9 @@ const (
 	LineColorInserted = tcell.ColorGreen
 	LineColorDeleted = tcell.ColorRed
 )
+
+// ExpandTabStr is used to expand tabs into strings
+const ExpandTabStr = "    "
 
 ////////////////////////////////////////////////////////////
 // diffView methods
@@ -94,7 +97,11 @@ func (tv *diffView) SetFilePatch(patch diff.FilePatch) {
 	for _, c := range patch.Chunks() {
 		content := c.Content()
 		op := c.Type()
+
 		for _, l := range strings.Split(content, "\n") {
+			// since tview does not display tabs, expand tabs to string
+			l = strings.Replace(l, "\t", ExpandTabStr, -1)
+
 			var cell *tview.TableCell
 			switch op {
 			case diff.Equal:
@@ -111,4 +118,5 @@ func (tv *diffView) SetFilePatch(patch diff.FilePatch) {
 			idx++
 		}
 	}
+	tableView.ScrollToBeginning()
 }
